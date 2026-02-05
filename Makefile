@@ -50,7 +50,7 @@ docker-build: ## Build Docker image
 	docker build -t your-project .
 
 docker-run: ## Run Docker container
-	docker run -p 8000:8081 your-project
+	docker run -p 8000:8000 your-project
 
 docker-compose-up: ## Start services with docker-compose
 	docker-compose up -d
