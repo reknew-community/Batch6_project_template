@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     # 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
-    @field_validator("DATA_DIR", pre=True)
+    @field_validator("FIELD_NAME", mode='before')
     def create_data_dir(cls, v):
         """Create data directory if it doesn't exist."""
         if isinstance(v, str):
