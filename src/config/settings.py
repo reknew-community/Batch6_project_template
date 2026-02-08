@@ -4,7 +4,8 @@ import os
 from pathlib import Path
 from typing import List, Optional
 
-from pydantic import BaseSettings, validator
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -34,7 +35,10 @@ class Settings(BaseSettings):
     # External APIs (optional)
     API_KEY: Optional[str] = None
     
-    @validator("DATA_DIR", pre=True)
+    # 
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+
+    @field_validator("DATA_DIR", pre=True)
     def create_data_dir(cls, v):
         """Create data directory if it doesn't exist."""
         if isinstance(v, str):
