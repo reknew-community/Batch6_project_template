@@ -4,14 +4,14 @@ services:
   app:
     build: .
     ports:
-      - "8000:8000"
+      - "8081:8000" #change host port to 8081
     environment:
       - APP_ENV=development
       - DATABASE_URL=postgresql://postgres:password@db:5432/appdb
       - REDIS_URL=redis://redis:6379/0
-    volumes:
-      - .:/app
-      - /app/.venv
+    #volumes:
+      #- .:/app
+      #- /app/.venv
     depends_on:
       - db
       - redis
