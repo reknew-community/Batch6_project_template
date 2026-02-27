@@ -35,3 +35,5 @@ backend/source
 *.njsproj
 *.sln
 *.sw?
+
+frontend/package-lock.json
