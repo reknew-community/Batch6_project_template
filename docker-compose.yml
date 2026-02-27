@@ -16,6 +16,7 @@ services:
       - MYSQL_DB=${MYSQL_DB}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - FRONTEND_URL=${FRONTEND_URL}
+      - GROQ_API_KEY=${GROQ_API_KEY}
     expose:
       - "8000"
     restart: unless-stopped

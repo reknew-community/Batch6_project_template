@@ -342,3 +342,23 @@ def hubs_status(limit: int = 50):
         """,
         (limit,),
     )
+
+@app.get("/api/shipments/delayed")
+def get_delayed_shipments():
+    return fetch_all(
+        """
+        SELECT
+            s.id AS shipment_id,
+            a.awb_number,
+            s.origin_city,
+            s.destination_city,
+            s.current_status,
+            s.expected_delivery_date AS eta,
+            COALESCE(s.last_status_update, s.updated_ts) AS last_updated
+        FROM shipments s
+        JOIN awb_numbers a ON a.id = s.awb_id
+        WHERE s.current_status = 'DELAYED'
+        ORDER BY s.expected_delivery_date ASC
+        """,
+        (),
+    )
