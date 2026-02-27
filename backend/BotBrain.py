@@ -16,16 +16,18 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 # The model we decided to use
 MODEL = "llama-3.3-70b-versatile"
 
-# Your main backend URL - botbrain will fetch live data from here
-MAIN_BACKEND = "http://localhost:8000"
+# Main backend URL - overridden in Docker via MAIN_BACKEND_URL env var
+# (containers can't reach each other via localhost)
+MAIN_BACKEND = os.getenv("MAIN_BACKEND_URL", "http://localhost:8000")
 
 # Create our FastAPI app
 app = FastAPI()
 
 # Allow React frontend to talk to this service
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[FRONTEND_URL],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -161,8 +163,7 @@ Guidelines:
 - Always base your answers on the live data fetched via tools
 - Keep responses concise and focused on logistics operations
 - Use bullet points for lists of exceptions or vendors
-- If asked something outside logistics operations, politely decline
-- Always mention specific numbers and data points in your answers
+- Don't make up data - if the tools don't return the info, say you don't know
 """
 
 @app.post("/chat", response_model=ChatResponse)

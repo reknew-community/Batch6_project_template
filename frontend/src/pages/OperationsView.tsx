@@ -56,29 +56,29 @@ type SummaryData = {
 type ShipmentDetail = {
     shipment_id: number;
     awb_number: string | null;
-    origin_city: string | null;
     destination_city: string | null;
     destination_state: string | null;
     destination_pincode: string | null;
     current_status: string | null;
-    expected_delivery_date: string | null;
     actual_delivery_date: string | null;
-    booking_date: string | null;
+    last_status_update: string | null;
     has_exception: number | null;
     exception_type: string | null;
     exception_notes: string | null;
     consignee_name: string | null;
+    consignee_phone: string | null;
     consignee_address: string | null;
     product_type: string | null;
-    description: string | null;
+    shipment_description: string | null;
     weight_kg: number | null;
     number_of_boxes: number | null;
-    service_type: string | null;
-    booking_id: number | null;
-    current_hub_code: string | null;
-    current_hub_name: string | null;
+    trip_code: string | null;
     vendor_name: string | null;
-    last_updated_ts: string | null;
+    vendor_type: string | null;
+    vendor_phone: string | null;
+    driver_name: string | null;
+    driver_phone: string | null;
+    vehicle_number: string | null;
 };
 
 type ExceptionRow = {
@@ -183,16 +183,16 @@ export default function OperationsView() {
     };
 
     const handleSearch = () => {
-        const id = searchId.trim();
-        if (!id) return;
+        const q = searchId.trim();
+        if (!q) return;
         setSearchLoading(true);
         setSearchResult(null);
         setSearchError(null);
-        api.get(`/api/shipments/${id}`)
+        api.get("/api/shipments/search", { params: { q } })
             .then((res) => setSearchResult(res.data))
             .catch((err) => {
                 if (err.response?.status === 404) {
-                    setSearchError(`No shipment found with ID "${id}".`);
+                    setSearchError(`No shipment found for "${q}".`);
                 } else {
                     setSearchError("Failed to fetch shipment details. Please try again.");
                 }
@@ -271,11 +271,11 @@ export default function OperationsView() {
             </Modal>
 
             {/* ── Shipment Lookup ── */}
-            <Card title="Shipment Lookup">
+            <Card title="Shipment Lookup — Search by ID or AWB">
                 <Flex vertical gap={16} style={{ width: "100%" }}>
                     <Space.Compact style={{ width: "100%", maxWidth: 480 }}>
                         <Input
-                            placeholder="Enter Shipment ID"
+                            placeholder="Enter Shipment ID or AWB Number"
                             value={searchId}
                             onChange={(e) => setSearchId(e.target.value)}
                             onPressEnter={handleSearch}
@@ -312,11 +312,9 @@ export default function OperationsView() {
                                 column={2}
                             >
                                 <Descriptions.Item label="AWB Number">{searchResult.awb_number || "—"}</Descriptions.Item>
-                                <Descriptions.Item label="Current Hub">{searchResult.current_hub_name || searchResult.current_hub_code || "—"}</Descriptions.Item>
-                                <Descriptions.Item label="Origin">{searchResult.origin_city || "—"}</Descriptions.Item>
-                                <Descriptions.Item label="Expected Delivery">{searchResult.expected_delivery_date || "—"}</Descriptions.Item>
+                                <Descriptions.Item label="Destination">{searchResult.destination_city || "—"}</Descriptions.Item>
                                 <Descriptions.Item label="Actual Delivery">{searchResult.actual_delivery_date || "—"}</Descriptions.Item>
-                                <Descriptions.Item label="Last Updated">{searchResult.last_updated_ts || "—"}</Descriptions.Item>
+                                <Descriptions.Item label="Last Updated">{searchResult.last_status_update || "—"}</Descriptions.Item>
                                 {searchResult.has_exception ? (
                                     <Descriptions.Item label="Exception" span={2}>
                                         <Space>
@@ -330,23 +328,21 @@ export default function OperationsView() {
                             {/* Detail sections — 2 per row */}
                             <Row gutter={[12, 12]}>
                                 <Col xs={24} md={12}>
-                                    <Descriptions title="Vendor" bordered size="small" column={1}>
+                                    <Descriptions title="Vendor & Driver" bordered size="small" column={1}>
                                         <Descriptions.Item label="Vendor Name">{searchResult.vendor_name || "—"}</Descriptions.Item>
-                                    </Descriptions>
-                                </Col>
-
-                                <Col xs={24} md={12}>
-                                    <Descriptions title="Booking" bordered size="small" column={1}>
-                                        <Descriptions.Item label="Booking ID">{searchResult.booking_id || "—"}</Descriptions.Item>
-                                        <Descriptions.Item label="Service Type">{searchResult.service_type || "—"}</Descriptions.Item>
-                                        <Descriptions.Item label="Booking Date">{searchResult.booking_date || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Vendor Type">{searchResult.vendor_type || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Vendor Phone">{searchResult.vendor_phone || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Driver Name">{searchResult.driver_name || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Driver Phone">{searchResult.driver_phone || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Vehicle No.">{searchResult.vehicle_number || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Trip Code">{searchResult.trip_code || "—"}</Descriptions.Item>
                                     </Descriptions>
                                 </Col>
 
                                 <Col xs={24} md={12}>
                                     <Descriptions title="Package" bordered size="small" column={1}>
                                         <Descriptions.Item label="Product Type">{searchResult.product_type || "—"}</Descriptions.Item>
-                                        <Descriptions.Item label="Description">{searchResult.description || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Description">{searchResult.shipment_description || "—"}</Descriptions.Item>
                                         <Descriptions.Item label="Weight">{searchResult.weight_kg != null ? `${searchResult.weight_kg} kg` : "—"}</Descriptions.Item>
                                         <Descriptions.Item label="Number of Boxes">{searchResult.number_of_boxes ?? "—"}</Descriptions.Item>
                                     </Descriptions>
@@ -355,6 +351,7 @@ export default function OperationsView() {
                                 <Col xs={24} md={12}>
                                     <Descriptions title="Consignee" bordered size="small" column={1}>
                                         <Descriptions.Item label="Name">{searchResult.consignee_name || "—"}</Descriptions.Item>
+                                        <Descriptions.Item label="Phone">{searchResult.consignee_phone || "—"}</Descriptions.Item>
                                         <Descriptions.Item label="Address">{searchResult.consignee_address || "—"}</Descriptions.Item>
                                         <Descriptions.Item label="City">{searchResult.destination_city || "—"}</Descriptions.Item>
                                         <Descriptions.Item label="State">{searchResult.destination_state || "—"}</Descriptions.Item>

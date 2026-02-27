@@ -1,8 +1,9 @@
 FROM node:20-alpine as build
 WORKDIR /app
 
-# Accept build argument for API URL
+# Accept build arguments for API URLs
 ARG VITE_API_URL=http://localhost:3000
+ARG VITE_BOT_URL=http://localhost:8001
 
 # Install dependencies first
 COPY package*.json ./
@@ -12,7 +13,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the application with VITE_API_URL available during build
-RUN VITE_API_URL=$VITE_API_URL npm run build
+RUN VITE_API_URL=$VITE_API_URL VITE_BOT_URL=$VITE_BOT_URL npm run build
 
 FROM node:20-alpine as runtime
 WORKDIR /app

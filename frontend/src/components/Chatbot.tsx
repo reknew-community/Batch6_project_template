@@ -42,7 +42,8 @@ export default function ChatBot() {
     setInputValue("");
 
     try {
-        const res = await fetch("http://localhost:8001/chat", {
+        const BOT_URL = import.meta.env.VITE_BOT_URL || "http://localhost:8001";
+        const res = await fetch(`${BOT_URL}/chat`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

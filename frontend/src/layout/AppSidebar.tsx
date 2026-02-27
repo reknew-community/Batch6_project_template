@@ -14,7 +14,6 @@ import {
     DeploymentUnitOutlined,
     TeamOutlined,
     FileSearchOutlined,
-    BarChartOutlined,
     UserOutlined,
     LogoutOutlined,
 } from "@ant-design/icons";
@@ -46,7 +45,6 @@ export default function AppSidebar({ role, user }: Props) {
             { key: "ops", label: "Operations", icon: <DeploymentUnitOutlined />, path: "/operations", roles: ["SUPER_ADMIN","OPS_MANAGER"] },
             { key: "vendors", label: "Vendors", icon: <TeamOutlined />, path: "/vendors", roles: ["SUPER_ADMIN","VENDOR_USER"] },
             { key: "docs", label: "Documents", icon: <FileSearchOutlined />, path: "/documents", roles: ["SUPER_ADMIN","OPS_MANAGER","VENDOR_USER"] },
-            { key: "analytics", label: "Analytics", icon: <BarChartOutlined />, path: "/analytics", roles: ["SUPER_ADMIN","ANALYST"] },
         ],
         [] // static items, no dependencies needed
     );

@@ -17,7 +17,7 @@ export default function AppHeader({ user }: Props) {
     <Space style={{ width: "100%", justifyContent: "space-between" }}>
       <div>
         <Typography.Text style={{ fontSize: 16, fontWeight: 800, color: "#0b1b2b" }}>
-          Logistics Control Tower
+          Ops Command Center
         </Typography.Text>
         <div style={{ fontSize: 12, color: "rgba(0,0,0,0.45)" }}>
           Operations & Visibility Dashboard

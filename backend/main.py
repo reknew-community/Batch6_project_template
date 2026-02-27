@@ -125,10 +125,18 @@ def login(req: LoginRequest):
 def get_customers():
     return fetch_all("SELECT * FROM customers ORDER BY id")
 
-# /api/vendors- This endpoint returns a list of all vendors in the system, ordered by their ID.
+# /api/vendors- Returns all vendors with the latest performance_score from vendor_performance.
 @app.get("/api/vendors")
 def get_vendors():
-    return fetch_all("SELECT * FROM vendors ORDER BY id")
+    return fetch_all(
+        """
+        SELECT v.*,
+            (SELECT performance_score FROM vendor_performance
+             WHERE vendor_id = v.id ORDER BY calculation_date DESC LIMIT 1) AS performance_score
+        FROM vendors v
+        ORDER BY v.id
+        """
+    )
 
 # /api/vendors/:id/performance
 @app.get("/api/vendors/{vendor_id}/performance")
@@ -260,43 +268,28 @@ def shipments_trend():
         """
     )
 
-# /api/shipments/{shipment_id} - Returns full detail for a single shipment including vendor, consignee, package, and booking info.
+# /api/shipments/search?q= - Looks up a shipment by numeric ID or AWB number string.
+@app.get("/api/shipments/search")
+def search_shipment(q: str):
+    if q.strip().isdigit():
+        row = fetch_one(
+            "SELECT * FROM vw_shipment_details WHERE shipment_id = %s",
+            (int(q.strip()),),
+        )
+    else:
+        row = fetch_one(
+            "SELECT * FROM vw_shipment_details WHERE awb_number = %s",
+            (q.strip(),),
+        )
+    if not row:
+        raise HTTPException(status_code=404, detail=f"No shipment found for '{q}'")
+    return row
+
+# /api/shipments/{shipment_id} - Returns full detail for a single shipment via vw_shipment_details.
 @app.get("/api/shipments/{shipment_id}")
 def get_shipment_detail(shipment_id: int):
     row = fetch_one(
-        """
-        SELECT
-            s.id AS shipment_id,
-            a.awb_number,
-            s.origin_city,
-            s.destination_city,
-            s.destination_state,
-            s.destination_pincode,
-            s.current_status,
-            s.expected_delivery_date,
-            s.actual_delivery_date,
-            s.booking_date,
-            s.has_exception,
-            s.exception_type,
-            s.exception_notes,
-            s.consignee_name,
-            s.consignee_address,
-            s.product_type,
-            s.description,
-            s.weight_kg,
-            s.number_of_boxes,
-            s.service_type,
-            s.booking_id,
-            h.hub_code AS current_hub_code,
-            h.hub_name AS current_hub_name,
-            v.name AS vendor_name,
-            COALESCE(s.last_status_update, s.updated_ts) AS last_updated_ts
-        FROM shipments s
-        JOIN awb_numbers a ON a.id = s.awb_id
-        LEFT JOIN hubs h ON h.id = s.current_hub_id
-        LEFT JOIN vendors v ON v.id = s.assigned_vendor_id
-        WHERE s.id = %s
-        """,
+        "SELECT * FROM vw_shipment_details WHERE shipment_id = %s",
         (shipment_id,),
     )
     if not row:

@@ -9,7 +9,7 @@ import { api } from "../api/client";
  * It fetches data from our local API endpoints to populate KPIs, activity feed, and charts.
  */
 type Summary = {
-    shipments_in_transit: number;
+    in_transit: number;
     exceptions: number;
     delayed_shipments: number;
     on_time_rate: number;
@@ -136,7 +136,7 @@ export default function DashboardHome() {
             <Card>
                 <Statistic 
                     title="Shipments In Transit" 
-                    value={summary?.shipments_in_transit ?? 0} 
+                    value={summary?.in_transit ?? 0}
                     loading={loadingSummary}
                 />
             </Card>
@@ -204,7 +204,7 @@ export default function DashboardHome() {
             <Col span={8}>
                 <Card title="Quick Actions">
                     <Button type="primary" block onClick={() => nav("/operations")}>
-                        View Live Operations
+                        View Operations Info
                     </Button>
 
                     <Divider style={{ margin: "12px 0" }} />
@@ -214,25 +214,21 @@ export default function DashboardHome() {
 
                     <Divider style={{ margin: "12px 0" }} />
                     <Button block onClick={() => nav("/vendors")}>
-                        Vendor Scorecards
+                        Vendor Performance
                     </Button>
 
-                    <Divider style={{ margin: "12px 0" }} />
-                    <Button block onClick={() => nav("/analytics")}>
-                        Open Analytics
-                    </Button>
                 </Card>
             </Col>
 
             {/* Charts */}
             <Col span={12} style={{ marginTop: 16 }}>
-                <Card title="Shipments Trend (From out local data)">
+                <Card title="Shipments Trend">
                     <Line {...lineConfig} />
                 </Card>
             </Col>
 
             <Col span={12} style={{ marginTop: 16 }}>
-                <Card title="Exceptions by Type (From our local data)">
+                <Card title="Exceptions by Type">
                     <Column {...columnConfig} />
                 </Card>
             </Col>
