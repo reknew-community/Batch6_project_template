@@ -1,39 +1,40 @@
 version: '3.8'
 
-networks:
-  app-network:
-    driver: bridge
-
 services:
   backend:
     build: 
       context: ./backend
     environment:
-      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_HOST=${MYSQL_HOST:-157.180.28.78}
       - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DB=${MYSQL_DB}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - FRONTEND_URL=${FRONTEND_URL}
-      - GROQ_API_KEY=${GROQ_API_KEY}
+      - MYSQL_USER=${MYSQL_USER:-tbatch6}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-tbatch6}
+      - MYSQL_DB=${MYSQL_DB:-tbatch6_db}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-RENEW_SMARTHUB_OPERATIONS_BATCH6_REACTUI_SECRET}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
     expose:
       - "8000"
     restart: unless-stopped
-    networks:
-      - app-network
+
+  botbrain:
+    build:
+      context: ./chatbot
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - MAIN_BACKEND_URL=${MAIN_BACKEND_URL:-http://backend:8000}
+    expose:
+      - "8001"
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
       args:
-        - VITE_API_URL=${VITE_API_URL}
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
+        - VITE_CHATBOT_URL=${VITE_CHATBOT_URL:-http://localhost:8001}
     expose:
       - "3000"
     depends_on:
       - backend
     restart: unless-stopped
-    networks:
-      - app-network
-    environment:
-      - VITE_API_URL=${VITE_API_URL}

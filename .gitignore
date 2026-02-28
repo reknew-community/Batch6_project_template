@@ -37,3 +37,4 @@ backend/source
 *.sw?
 
 frontend/package-lock.json
+docker-compose.override.yml

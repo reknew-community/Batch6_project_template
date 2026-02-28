@@ -40,7 +40,7 @@ export default function Documents() {
     };
 
     const handleViewPdf = (record: ShipmentResult) => {
-        const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+        const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
         setSelectedPdfUrl(`${baseUrl}/pod_docs/${record.pod_document_url}`);
     };
 

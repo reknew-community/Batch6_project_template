@@ -17,7 +17,11 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 MODEL = "llama-3.3-70b-versatile"
 
 # Your main backend URL - botbrain will fetch live data from here
-MAIN_BACKEND = "http://localhost:8000"
+# For docker: use 'http://backend:8000', for local dev: 'http://localhost:8000'
+MAIN_BACKEND = os.getenv("MAIN_BACKEND_URL", "http://backend:8000")
+
+# Frontend URL for CORS
+FRONTEND_URLS = os.getenv("FRONTEND_URL", "http://localhost:3000").split(",")
 
 # Create our FastAPI app
 app = FastAPI()
@@ -25,7 +29,8 @@ app = FastAPI()
 # Allow React frontend to talk to this service
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=FRONTEND_URLS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

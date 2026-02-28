@@ -27,7 +27,7 @@ if not all([MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DB]):
 app = FastAPI(title="Logistics Local APIs (MySQL)")
 app.mount("/pod_docs", StaticFiles(directory="static/POD_documents"), name="pod_docs")
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 # CORS middleware is added to allow requests from the frontend (running on localhost:5173).
 app.add_middleware(
